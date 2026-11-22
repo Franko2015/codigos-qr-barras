@@ -57,6 +57,11 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "github-pages": {
+              "outputMode": "static",
+              "ssr": false,
+              "baseHref": "/codigos-qr-barras/"
             }
           },
           "defaultConfiguration": "production"

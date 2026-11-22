@@ -13,7 +13,16 @@ Aplicación web (Angular 22) para **crear, descargar, imprimir y guardar** códi
 - **Compartir**: en celulares, abre el menú del sistema para enviarlo o guardarlo en la galería.
 - **Instalable (PWA)**: en teléfonos y tablets se puede instalar en la pantalla de inicio y funciona sin internet. En Android aparece el botón «Instalar app»; en iPhone/iPad se muestran los pasos (Compartir → Agregar a pantalla de inicio). En computadoras no se ofrece instalar.
 
-## Publicar
+## Publicar en GitHub Pages
+
+1. En GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+2. Haz push a la rama `master`. El flujo `.github/workflows/deploy.yml` ejecuta las pruebas, compila y publica.
+3. La app queda en `https://franko2015.github.io/codigos-qr-barras/`.
+
+Para compilar lo mismo en local: `npm run build:gh-pages` (salida en `dist/codigos-qr-barras/browser`).
+Si cambias el nombre del repositorio, actualiza `baseHref` en la configuración `github-pages` de `angular.json`.
+
+## Publicar en un servidor propio (Node, con SSR)
 
 - Se necesita **HTTPS** para que la app se pueda instalar (en `localhost` funciona sin HTTPS).
 - El servidor SSR solo acepta los dominios permitidos: agrega el tuyo en `angular.json` → `security.allowedHosts` (por ejemplo `["codigos.midominio.com"]`) o usa la variable de entorno `NG_ALLOWED_HOSTS`.

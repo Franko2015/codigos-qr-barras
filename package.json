@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:gh-pages": "ng build --configuration production,github-pages && node scripts/gh-pages-postbuild.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:codigos-qr-barras": "node dist/codigos-qr-barras/server/server.mjs"
