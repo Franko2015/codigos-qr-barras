@@ -1,0 +1,34 @@
+export default `<!doctype html>
+<html lang="es" data-beasties-container="">
+  <head>
+    <meta charset="utf-8">
+    <title>Códigos QR y de barras</title>
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="Crea, descarga, imprime y guarda códigos QR y códigos de barras gratis, directamente en tu dispositivo.">
+    <meta name="theme-color" content="#1d4ed8">
+    <meta name="color-scheme" content="light dark">
+    <!-- Installed on iPhone/iPad (Safari ignores most of the manifest) -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Códigos QR">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="manifest" href="manifest.webmanifest">
+    <script>
+      // The install prompt can fire before Angular starts: keep it for the InstallApp service.
+      addEventListener('beforeinstallprompt', function (event) {
+        event.preventDefault();
+        window.__installPrompt = event;
+        dispatchEvent(new Event('installpromptready'));
+      });
+    </script>
+  <style>:root{color-scheme:light;--bg:#f3f5f9;--surface:#ffffff;--surface-2:#f8fafc;--text:#111827;--muted:#4b5563;--border:#d1d5db;--border-strong:#6b7280;--primary:#1d4ed8;--primary-hover:#1e40af;--primary-soft:#e8efff;--on-primary:#ffffff;--link:#1d4ed8;--danger:#b91c1c;--danger-soft:#fdecec;--warning-bg:#fef3c7;--warning-text:#713f12;--focus:#1d4ed8;--shadow:0 1px 2px rgb(15 23 42 / 6%), 0 4px 16px rgb(15 23 42 / 6%);--radius:14px;--radius-sm:10px;--tabbar-height:0px;--safe-bottom:env(safe-area-inset-bottom, 0px)}@media(prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#0b1120;--surface:#131b2c;--surface-2:#1a2438;--text:#e5e7eb;--muted:#a5b0c2;--border:#2c3a55;--border-strong:#8a97ad;--primary:#2563eb;--primary-hover:#1d4ed8;--primary-soft:#1b2b4f;--on-primary:#ffffff;--link:#93c5fd;--danger:#fca5a5;--danger-soft:#3b1d24;--warning-bg:#3d2f0c;--warning-text:#fde68a;--focus:#93c5fd;--shadow:none}}*,*:before,*:after{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;min-height:100dvh;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif;font-size:16px;line-height:1.5}@media(max-width:640px){:root{--tabbar-height:64px}}@media print{@page{margin:10mm}body{background:#fff}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}</style><link rel="stylesheet" href="styles-ROAPSZ23.css" media="print" data-beasties-media="all"><noscript><link rel="stylesheet" href="styles-ROAPSZ23.css"></noscript></head>
+  <body ngcm="">
+    <app-root></app-root>
+    <noscript>Activa JavaScript en tu navegador para usar esta aplicación.</noscript>
+  <script src="main-JH6XDMZG.js" type="module"></script><script>document.querySelectorAll('link[data-beasties-media]').forEach(function(l){l.media=l.getAttribute('data-beasties-media');l.removeAttribute('data-beasties-media')})</script></body>
+</html>
+`;
