@@ -1,13 +1,36 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>CodigosQrBarras</title>
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-</head>
-<body>
-  <app-root></app-root>
-</body>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Códigos QR y de barras</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Crea, descarga, imprime y guarda códigos QR y códigos de barras gratis, directamente en tu dispositivo."
+    />
+    <meta name="theme-color" content="#1d4ed8" />
+    <meta name="color-scheme" content="light dark" />
+    <!-- Installed on iPhone/iPad (Safari ignores most of the manifest) -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Códigos QR" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <script>
+      // The install prompt can fire before Angular starts: keep it for the InstallApp service.
+      addEventListener('beforeinstallprompt', function (event) {
+        event.preventDefault();
+        window.__installPrompt = event;
+        dispatchEvent(new Event('installpromptready'));
+      });
+    </script>
+  </head>
+  <body>
+    <app-root></app-root>
+    <noscript>Activa JavaScript en tu navegador para usar esta aplicación.</noscript>
+  </body>
 </html>

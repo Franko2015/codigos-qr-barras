@@ -1,0 +1,362 @@
+<div class="page">
+  <header class="page__intro">
+    <h1>{{ editingId() ? 'Editar código' : 'Crea tu código' }}</h1>
+    <p>
+      Elige el tipo, escribe el contenido y descárgalo, guárdalo o imprímelo. Todo se hace en tu
+      dispositivo.
+    </p>
+  </header>
+
+  <div class="generator">
+    <form class="panel generator__form" novalidate (submit)="$event.preventDefault()">
+      <fieldset class="type-picker">
+        <legend class="step">
+          <span class="step__n" aria-hidden="true">1</span> ¿Qué quieres crear?
+        </legend>
+        <div class="type-picker__options">
+          <label class="type-option">
+            <input type="radio" value="qr" [formField]="f.type" />
+            <span class="type-option__card">
+              <svg class="type-option__icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 18h2v2h-2zM14 18h2M18 14h2"
+                />
+              </svg>
+              <span class="type-option__title">Código QR</span>
+              <span class="type-option__desc"
+                >Enlaces, textos, datos de contacto. Se lee con la cámara del celular.</span
+              >
+            </span>
+          </label>
+          <label class="type-option">
+            <input type="radio" value="barcode" [formField]="f.type" />
+            <span class="type-option__card">
+              <svg class="type-option__icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 5v14M7 5v14M10 5v14M14 5v14M17 5v14M20 5v14" />
+              </svg>
+              <span class="type-option__title">Código de barras</span>
+              <span class="type-option__desc"
+                >Productos, inventario, etiquetas. Se lee con lectores de caja.</span
+              >
+            </span>
+          </label>
+        </div>
+      </fieldset>
+
+      @if (!isQr()) {
+        <fieldset class="choices">
+          <legend>¿Para qué lo usarás?</legend>
+          <label class="choice">
+            <input type="radio" value="inventory" [formField]="f.purpose" />
+            <span>
+              <span class="choice__title">Inventario</span>
+              <span class="choice__desc">
+                Te sugerimos un código único, por ejemplo SKU-48203917.
+              </span>
+            </span>
+          </label>
+          <label class="choice">
+            <input type="radio" value="manual" [formField]="f.purpose" />
+            <span>
+              <span class="choice__title">Otro uso</span>
+              <span class="choice__desc"
+                >Eliges el formato (EAN-13, UPC…) y escribes el código.</span
+              >
+            </span>
+          </label>
+        </fieldset>
+
+        @if (isInventory()) {
+          <div class="field field--short">
+            <label for="sku-prefix">Iniciales del código</label>
+            <input
+              id="sku-prefix"
+              type="text"
+              autocomplete="off"
+              autocapitalize="characters"
+              spellcheck="false"
+              [formField]="f.skuPrefix"
+              [attr.aria-invalid]="f.skuPrefix().invalid()"
+              [attr.aria-describedby]="
+                f.skuPrefix().invalid() ? 'sku-prefix-error sku-prefix-hint' : 'sku-prefix-hint'
+              "
+            />
+            @if (f.skuPrefix().invalid()) {
+              <p id="sku-prefix-error" class="field__error">
+                {{ f.skuPrefix().errors()[0].message }}
+              </p>
+            }
+            <p id="sku-prefix-hint" class="field__hint">
+              Por ejemplo SKU- (productos), ACT- (activos) o BOD- (bodega).
+            </p>
+          </div>
+        } @else {
+          <div class="field">
+            <label for="format">Formato del código de barras</label>
+            <select id="format" [formField]="f.barcodeFormat">
+              @for (format of formats; track format.value) {
+                <option [value]="format.value">{{ format.name }} — {{ format.use }}</option>
+              }
+            </select>
+          </div>
+        }
+      }
+
+      <div class="field">
+        <label for="content" class="step">
+          <span class="step__n" aria-hidden="true">2</span>
+          @if (isQr()) {
+            Contenido: enlace o texto
+          } @else if (isInventory()) {
+            Código sugerido <span class="optional">(puedes cambiarlo)</span>
+          } @else {
+            Número o texto del código
+          }
+        </label>
+        @if (isQr()) {
+          <textarea
+            id="content"
+            #contentInput
+            rows="3"
+            placeholder="https://tusitio.com"
+            [formField]="f.content"
+            [attr.aria-invalid]="showContentError()"
+            [attr.aria-describedby]="
+              showContentError() ? 'content-error content-hint' : 'content-hint'
+            "
+          ></textarea>
+        } @else {
+          <input
+            id="content"
+            #contentInput
+            type="text"
+            autocomplete="off"
+            spellcheck="false"
+            [attr.inputmode]="formatInfo().numeric ? 'numeric' : 'text'"
+            [placeholder]="
+              isInventory() ? model().skuPrefix + '00000000' : 'Ej.: ' + formatInfo().example
+            "
+            [formField]="f.content"
+            [attr.aria-invalid]="showContentError()"
+            [attr.aria-describedby]="
+              showContentError() ? 'content-error content-hint' : 'content-hint'
+            "
+          />
+        }
+        @if (showContentError()) {
+          <p id="content-error" class="field__error">{{ f.content().errors()[0].message }}</p>
+        }
+        <div class="field__meta">
+          <p id="content-hint" class="field__hint">
+            @if (isQr()) {
+              Pega un enlace o escribe cualquier texto.
+            } @else if (isInventory()) {
+              Las iniciales más {{ skuDigits }} números al azar, sin repetir tus códigos guardados.
+            } @else {
+              {{ formatInfo().hint }}
+            }
+          </p>
+          @if (isQr()) {
+            <span class="field__counter">{{ model().content.length }} / {{ qrMaxLength }}</span>
+          }
+        </div>
+        @if (isInventory()) {
+          <button type="button" class="button button--small field__action" (click)="generateSku()">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 11a8 8 0 0 0-14.9-4M4 13a8 8 0 0 0 14.9 4M5 3v4h4M19 21v-4h-4" />
+            </svg>
+            Generar otro número
+          </button>
+        } @else {
+          <button type="button" class="link-button" (click)="useExample()">Usar un ejemplo</button>
+        }
+        <span class="sr-only" aria-live="polite">{{ skuAnnouncement() }}</span>
+      </div>
+
+      <div class="field">
+        <label for="label" class="step">
+          <span class="step__n" aria-hidden="true">3</span>
+          Nombre <span class="optional">(opcional)</span>
+        </label>
+        <input
+          id="label"
+          type="text"
+          autocomplete="off"
+          [placeholder]="isInventory() ? 'Ej.: Caja de tornillos 3/8' : 'Ej.: Menú del restaurante'"
+          aria-describedby="label-hint"
+          [formField]="f.label"
+        />
+        <p id="label-hint" class="field__hint">
+          Para reconocerlo en «Guardados», nombrar el archivo y mostrarlo al imprimir.
+        </p>
+      </div>
+
+      <details class="customize">
+        <summary>Personalizar colores y tamaño</summary>
+        <div class="customize__body">
+          <div class="customize__colors">
+            <div class="field field--color">
+              <input id="foreground" type="color" [formField]="f.foreground" />
+              <label for="foreground">Color del código</label>
+            </div>
+            <div class="field field--color">
+              <input id="background" type="color" [formField]="f.background" />
+              <label for="background">Color de fondo</label>
+            </div>
+          </div>
+          @if (colorWarning(); as warning) {
+            <p class="notice notice--warning">{{ warning }}</p>
+          }
+
+          <div class="field">
+            <label for="margin"
+              >Margen en blanco alrededor: <strong>{{ model().margin }}</strong></label
+            >
+            <input id="margin" type="range" step="1" [formField]="f.margin" />
+          </div>
+
+          @if (isQr()) {
+            <div class="field">
+              <label for="error-level">Resistencia a manchas o roturas</label>
+              <select
+                id="error-level"
+                [formField]="f.qrErrorLevel"
+                aria-describedby="error-level-hint"
+              >
+                <option value="L">Baja (7 %) — código más simple</option>
+                <option value="M">Media (15 %) — recomendada</option>
+                <option value="Q">Alta (25 %)</option>
+                <option value="H">Máxima (30 %) — etiquetas expuestas</option>
+              </select>
+              <p id="error-level-hint" class="field__hint">
+                Más resistencia permite leerlo aunque esté dañado, pero el código se ve más denso.
+              </p>
+            </div>
+          } @else {
+            <div class="field">
+              <label for="bar-height"
+                >Altura de las barras: <strong>{{ model().barHeight }} px</strong></label
+              >
+              <input id="bar-height" type="range" step="10" [formField]="f.barHeight" />
+            </div>
+            <div class="field">
+              <label for="bar-width"
+                >Grosor de las barras: <strong>{{ model().barWidth }}</strong></label
+              >
+              <input id="bar-width" type="range" step="1" [formField]="f.barWidth" />
+            </div>
+            <label class="check">
+              <input type="checkbox" [formField]="f.showText" />
+              <span>Mostrar el número debajo de las barras</span>
+            </label>
+          }
+        </div>
+      </details>
+    </form>
+
+    <section #previewSection class="panel generator__preview" aria-labelledby="preview-title">
+      <h2 #previewHeading id="preview-title" class="step" tabindex="-1">
+        <span class="step__n" aria-hidden="true">4</span> Vista previa
+      </h2>
+
+      @let code = rendered();
+      <div class="preview" [class.preview--empty]="!code">
+        @if (code) {
+          <img
+            class="preview__image"
+            [src]="previewUrl()"
+            [alt]="previewAlt()"
+            [width]="code.width"
+            [height]="code.height"
+          />
+          @if (model().label.trim()) {
+            <p class="preview__label">{{ model().label }}</p>
+          }
+        } @else if (renderError()) {
+          <p class="preview__message preview__message--error" role="alert">{{ renderError() }}</p>
+        } @else {
+          <svg class="preview__placeholder" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4" />
+          </svg>
+          <p class="preview__message">Tu código aparecerá aquí cuando escribas el contenido.</p>
+        }
+      </div>
+
+      <div class="actions">
+        <button
+          type="button"
+          class="button button--primary"
+          [disabled]="!code"
+          (click)="code && actions.downloadPng(model(), code)"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14" />
+          </svg>
+          Descargar PNG
+        </button>
+        <button
+          type="button"
+          class="button"
+          [disabled]="!code"
+          (click)="code && actions.print(model(), code)"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9V3h10v6M7 18H4v-7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7h-3M7 14h10v7H7z" />
+          </svg>
+          Imprimir
+        </button>
+        <button type="button" class="button" [disabled]="!code" (click)="code && save(code)">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 3h10l4 4v14H4V3h2zm2 0v5h7V3M8 21v-7h8v7" />
+          </svg>
+          {{ editingId() ? 'Guardar cambios' : 'Guardar' }}
+        </button>
+        <button
+          type="button"
+          class="button"
+          [disabled]="!code"
+          (click)="code && actions.downloadSvg(model(), code)"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14" />
+          </svg>
+          Descargar SVG
+        </button>
+        @if (actions.canShare()) {
+          <button
+            type="button"
+            class="button actions__wide"
+            [disabled]="!code"
+            (click)="code && actions.share(model(), code)"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 15V3m0 0L8 7m4-4 4 4M5 12v8h14v-8" />
+            </svg>
+            Compartir o guardar en la galería
+          </button>
+        }
+      </div>
+      <p class="actions__note">
+        <strong>PNG</strong>: para documentos, redes y mensajería. <strong>SVG</strong>: para
+        imprentas y diseño, nunca pierde calidad. <strong>Guardar</strong>: lo deja en «Guardados»
+        de este dispositivo.
+      </p>
+
+      @if (editingId()) {
+        <button type="button" class="link-button" (click)="startNew()">
+          Crear un código nuevo
+        </button>
+      }
+    </section>
+  </div>
+
+  @if (rendered() && !previewVisible()) {
+    <div class="jump-bar">
+      <img class="jump-bar__thumb" [src]="previewUrl()" alt="" />
+      <span class="jump-bar__text">Tu código está listo</span>
+      <button type="button" class="button button--primary button--small" (click)="showPreview()">
+        Ver y descargar
+      </button>
+    </div>
+  }
+</div>

@@ -1,0 +1,116 @@
+<div class="page">
+  <header class="page__intro">
+    <h1 #heading tabindex="-1">Códigos guardados</h1>
+    <p>
+      Se guardan solo en este dispositivo y navegador. Desde aquí puedes descargarlos, imprimirlos o
+      editarlos.
+    </p>
+  </header>
+
+  @if (saved.loaded()) {
+    @if (saved.items().length === 0) {
+      <div class="panel empty">
+        <svg class="empty__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 18h2v2h-2z" />
+        </svg>
+        <h2>Aún no tienes códigos guardados</h2>
+        <p>Crea un código y pulsa «Guardar» para tenerlo siempre a mano aquí.</p>
+        <a class="button button--primary" routerLink="/">Crear un código</a>
+      </div>
+    } @else {
+      <div class="toolbar">
+        <div class="field toolbar__search">
+          <label for="search">Buscar</label>
+          <input
+            id="search"
+            #search
+            type="search"
+            autocomplete="off"
+            placeholder="Nombre o contenido"
+            [value]="query()"
+            (input)="query.set(search.value)"
+          />
+        </div>
+        <p class="toolbar__count" aria-live="polite">
+          {{ filtered().length }} de {{ saved.items().length }}
+          {{ saved.items().length === 1 ? 'código' : 'códigos' }}
+        </p>
+      </div>
+
+      @if (filtered().length === 0) {
+        <p class="panel empty">No hay códigos que coincidan con «{{ query() }}».</p>
+      } @else {
+        <ul class="saved-list">
+          @for (view of filtered(); track view.item.id) {
+            <li class="panel saved-card">
+              <div class="saved-card__thumb">
+                <img
+                  [src]="view.imageUrl"
+                  alt=""
+                  [width]="view.item.code.width"
+                  [height]="view.item.code.height"
+                />
+              </div>
+              <div class="saved-card__info">
+                <h2 class="saved-card__title">{{ view.title }}</h2>
+                <p class="saved-card__meta">
+                  {{ view.kind }} ·
+                  <time [attr.datetime]="view.item.createdAt | date: 'yyyy-MM-ddTHH:mm'">{{
+                    view.item.createdAt | date: 'd MMM y, HH:mm'
+                  }}</time>
+                </p>
+                @if (view.item.spec.label.trim()) {
+                  <p class="saved-card__content">{{ view.item.spec.content }}</p>
+                }
+              </div>
+              <div class="saved-card__actions">
+                <button
+                  type="button"
+                  class="button button--primary button--small"
+                  (click)="actions.downloadPng(view.item.spec, view.item.code)"
+                >
+                  Descargar PNG<span class="sr-only"> de {{ view.title }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="button button--small"
+                  (click)="actions.print(view.item.spec, view.item.code)"
+                >
+                  Imprimir<span class="sr-only"> {{ view.title }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="button button--small"
+                  (click)="actions.downloadSvg(view.item.spec, view.item.code)"
+                >
+                  Descargar SVG<span class="sr-only"> de {{ view.title }}</span>
+                </button>
+                @if (actions.canShare()) {
+                  <button
+                    type="button"
+                    class="button button--small"
+                    (click)="actions.share(view.item.spec, view.item.code)"
+                  >
+                    Compartir<span class="sr-only"> {{ view.title }}</span>
+                  </button>
+                }
+                <a class="button button--small" routerLink="/" [queryParams]="{ id: view.item.id }">
+                  Editar<span class="sr-only"> {{ view.title }}</span>
+                </a>
+                <button
+                  type="button"
+                  class="button button--small button--danger"
+                  (click)="remove(view)"
+                >
+                  Eliminar<span class="sr-only"> {{ view.title }}</span>
+                </button>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    }
+  } @else {
+    <p class="panel empty">Cargando…</p>
+  }
+</div>
